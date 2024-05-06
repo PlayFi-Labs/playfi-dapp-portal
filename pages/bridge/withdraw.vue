@@ -6,7 +6,7 @@
     <CommonAlert variant="warning" :icon="ExclamationTriangleIcon" class="mb-block-gap">
       <p>
         {{ eraNetwork.name }} is going through an upgrade and withdrawals are disabled until it is finished (expected
-        May 6th 18h00 UTC). Please come back later.
+        May 7th 18h00 UTC). Please come back later.
       </p>
     </CommonAlert>
 
