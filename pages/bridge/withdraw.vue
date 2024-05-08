@@ -38,7 +38,7 @@ useSeoMeta({
 });
 
 const { eraNetwork } = storeToRefs(useZkSyncProviderStore());
-const withdrawalsDisabled = computed(() => eraNetwork.value.key === "sepolia");
+const withdrawalsDisabled = computed(() => false);
 </script>
 
 <style lang="scss" scoped></style>
