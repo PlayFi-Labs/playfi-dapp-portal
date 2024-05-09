@@ -108,8 +108,10 @@
                     finalizeTransactionStatus === 'done' ||
                     transaction.info.toTransactionHash
                   "
+                  class="flex items-center gap-2"
                 >
-                  Claiming withdrawal...
+                  <span>Claiming withdrawal...</span>
+                  <CommonSpinner variant="text-color" class="h-5 w-5" aria-hidden="true" />
                 </span>
                 <span v-else>Claim withdrawal</span>
               </transition>
@@ -172,7 +174,7 @@ const withdrawalManualFinalizationRequired = computed(() => {
   );
 });
 const withdrawalFinalizationAvailable = computed(() => {
-  return props.transaction.info.withdrawalFinalizationAvailable;
+  return withdrawalManualFinalizationRequired.value && props.transaction.info.withdrawalFinalizationAvailable;
 });
 
 const {
