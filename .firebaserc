@@ -6,14 +6,14 @@
     "zksync-dapp-wallet-v2": {
       "hosting": {
         "web": [
-          "zksync-dapp-portal"
+          "zksync-dapp-wallet-v2"
         ]
       }
     },
     "staging-zksync-dapp-wallet-v2": {
       "hosting": {
         "web": [
-          "staging-zksync-dapp-portal"
+          "staging-zksync-dapp-wallet-v2"
         ]
       }
     }
