@@ -28,6 +28,9 @@
         >
           <p>You can claim your withdrawal now.</p>
         </CommonAlert>
+        <CommonAlert v-else-if="isCustomBridgeToken" variant="warning" :icon="ExclamationTriangleIcon" class="mb-4">
+          <p>This withdrawal was made through a third-party bridge. Please use that bridge to claim your withdrawal.</p>
+        </CommonAlert>
         <CommonAlert v-else variant="warning" :icon="ExclamationTriangleIcon" class="mb-4">
           <p>
             You will have to claim your withdrawal once it's processed. Claiming will require paying the fee on the
@@ -50,7 +53,7 @@
       :failed="transaction.info.failed"
       :animation-state="withdrawalFinalizationAvailable ? 'stopped-in-the-end' : undefined"
       :expected-complete-timestamp="
-        withdrawalFinalizationAvailable ? undefined : transaction.info.expectedCompleteTimestamp
+        withdrawalFinalizationAvailable || isCustomBridgeToken ? undefined : transaction.info.expectedCompleteTimestamp
       "
     >
       <template v-if="withdrawalFinalizationAvailable" #to-button>
@@ -166,6 +169,7 @@ const { eraNetwork, blockExplorerUrl } = storeToRefs(useZkSyncProviderStore());
 const { l1BlockExplorerUrl } = storeToRefs(useNetworkStore());
 const { connectorName, isCorrectNetworkSet } = storeToRefs(onboardStore);
 
+const isCustomBridgeToken = computed(() => !props.transaction.token.l1Address);
 const withdrawalManualFinalizationRequired = computed(() => {
   return (
     !props.transaction.info.completed &&
@@ -174,7 +178,11 @@ const withdrawalManualFinalizationRequired = computed(() => {
   );
 });
 const withdrawalFinalizationAvailable = computed(() => {
-  return withdrawalManualFinalizationRequired.value && props.transaction.info.withdrawalFinalizationAvailable;
+  return (
+    !isCustomBridgeToken.value &&
+    withdrawalManualFinalizationRequired.value &&
+    props.transaction.info.withdrawalFinalizationAvailable
+  );
 });
 
 const {

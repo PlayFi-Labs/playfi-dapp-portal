@@ -39,7 +39,7 @@ export const useZkSyncWithdrawalsStore = defineStore("zkSyncWithdrawals", () => 
         providerStore.requestProvider().getTransactionDetails(withdrawal.transactionHash!)
       );
 
-      const withdrawalFinalizationAvailable = transactionDetails.status === "verified";
+      const withdrawalFinalizationAvailable = !!transactionDetails.ethExecuteTxHash;
       const isFinalized = withdrawalFinalizationAvailable
         ? await useZkSyncWalletStore()
             .getL1VoidSigner(true)
