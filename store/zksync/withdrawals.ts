@@ -18,15 +18,21 @@ export const useZkSyncWithdrawalsStore = defineStore("zkSyncWithdrawals", () => 
     if (!eraNetwork.value.blockExplorerApi)
       throw new Error(`Block Explorer API is not available on ${eraNetwork.value.name}`);
 
-    const response: Api.Response.Collection<Api.Response.Transfer> = await $fetch(
-      `${eraNetwork.value.blockExplorerApi}/address/${account.value.address}/transfers?type=withdrawal`
-    );
+    const responses: Api.Response.Collection<Api.Response.Transfer>[] = await Promise.all([
+      $fetch(`${eraNetwork.value.blockExplorerApi}/address/${account.value.address}/transfers?limit=100&page=1`),
+      $fetch(`${eraNetwork.value.blockExplorerApi}/address/${account.value.address}/transfers?limit=100&page=2`),
+      $fetch(`${eraNetwork.value.blockExplorerApi}/address/${account.value.address}/transfers?limit=100&page=3`),
+    ]);
+    const withdrawalTransfers = responses
+      .map((response) => response.items.map(mapApiTransfer))
+      .flat()
+      .filter((e) => e.type === "withdrawal");
 
-    for (const withdrawal of response.items.map(mapApiTransfer)) {
+    for (const withdrawal of withdrawalTransfers) {
       if (!withdrawal.transactionHash) continue;
 
       const transactionFromStorage = transactionStatusStore.getTransaction(withdrawal.transactionHash);
-      if (transactionFromStorage?.info.completed) continue;
+      if (transactionFromStorage) continue;
 
       if (new Date(withdrawal.timestamp).getTime() < Date.now() - FETCH_TIME_LIMIT) break;
       const transactionDetails = await retry(() =>
