@@ -8,7 +8,7 @@ const metadata = {
   name: "PlayFi Portal",
   description: "PlayFi Portal - view balances, transfer and bridge tokens",
   url: process.env.APP_DOMAIN || "",
-  icons: [`${process.env.APP_DOMAIN || ""}/icon.png`],
+  icons: [`${process.env.APP_DOMAIN || ""}/icon.svg`],
 };
 
 if (!process.env.WALLET_CONNECT_PROJECT_ID) {
