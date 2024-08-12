@@ -9,6 +9,12 @@
           Your funds will be available on <span class="font-medium">{{ transaction.to.destination.label }}</span> after
           you claim the withdrawal.
         </template>
+        <template v-else-if="isCustomNode">
+          Your funds will be available for claiming after the transaction is processed on
+          <span class="font-medium">{{ eraNetwork.name }}</span> and executed on the
+          <span class="font-medium">{{ eraNetwork.l1Network?.name }}</span
+          >.
+        </template>
         <template v-else>
           Your funds will be available on <span class="font-medium">{{ transaction.to.destination.label }}</span> once
           the transaction is verified and claimed. During this time, the transaction will be processed
@@ -148,7 +154,6 @@
 <script lang="ts" setup>
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 
-import { isWithdrawalManualFinalizationRequired } from "@/composables/zksync/useTransaction";
 import useWithdrawalFinalization from "@/composables/zksync/useWithdrawalFinalization";
 import { isCustomNode } from "@/data/networks";
 
@@ -171,11 +176,7 @@ const { connectorName, isCorrectNetworkSet } = storeToRefs(onboardStore);
 
 const isCustomBridgeToken = computed(() => !props.transaction.token.l1Address);
 const withdrawalManualFinalizationRequired = computed(() => {
-  return (
-    !props.transaction.info.completed &&
-    (isCustomNode ||
-      isWithdrawalManualFinalizationRequired(props.transaction.token, eraNetwork.value.l1Network?.id || -1))
-  );
+  return !props.transaction.info.completed;
 });
 const withdrawalFinalizationAvailable = computed(() => {
   return (

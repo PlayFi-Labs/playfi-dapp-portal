@@ -17,6 +17,7 @@ export type DepositFeeValues = {
 export default (tokens: Ref<Token[]>, balances: Ref<TokenAmount[] | undefined>) => {
   const { getPublicClient } = useOnboardStore();
   const { getL1VoidSigner } = useZkSyncWalletStore();
+  const { requestProvider } = useZkSyncProviderStore();
 
   let params = {
     to: undefined as string | undefined,
@@ -41,7 +42,7 @@ export default (tokens: Ref<Token[]>, balances: Ref<TokenAmount[] | undefined>) 
   });
 
   const feeToken = computed(() => {
-    return tokens.value.find((e) => e.address === ETH_TOKEN.l1Address);
+    return tokens.value.find((e) => e.address === utils.ETH_ADDRESS);
   });
   const enoughBalanceToCoverFee = computed(() => {
     if (!feeToken.value || !balances.value || inProgress.value) {
@@ -59,24 +60,12 @@ export default (tokens: Ref<Token[]>, balances: Ref<TokenAmount[] | undefined>) 
     const signer = getL1VoidSigner();
     if (!signer) throw new Error("Signer is not available");
 
-    return await retry(async () => {
-      try {
-        return await signer.getFullRequiredDepositFee({
-          token: ETH_TOKEN.l1Address!,
-          to: params.to,
-        });
-      } catch (err) {
-        if (err instanceof Error && err.message.startsWith("Not enough balance for deposit!")) {
-          const match = err.message.match(/([\d\\.]+) ETH/);
-          if (feeToken.value && match?.length) {
-            const ethAmount = match[1].split(" ")?.[0];
-            recommendedBalance.value = parseEther(ethAmount);
-            return;
-          }
-        }
-        throw err;
-      }
-    });
+    return await retry(() =>
+      signer.getFullRequiredDepositFee({
+        token: utils.ETH_ADDRESS,
+        to: params.to,
+      })
+    );
   };
   const getERC20TransactionFee = () => {
     return {
@@ -98,10 +87,28 @@ export default (tokens: Ref<Token[]>, balances: Ref<TokenAmount[] | undefined>) 
       recommendedBalance.value = undefined;
       if (!feeToken.value) throw new Error("Fee tokens is not available");
 
-      if (params.tokenAddress === feeToken.value?.address) {
-        fee.value = await getEthTransactionFee();
-      } else {
-        fee.value = getERC20TransactionFee();
+      const provider = requestProvider();
+      const isEthBasedChain = await provider.isEthBasedChain();
+
+      try {
+        if (isEthBasedChain && params.tokenAddress === feeToken.value?.address) {
+          fee.value = await getEthTransactionFee();
+        } else {
+          fee.value = getERC20TransactionFee();
+        }
+      } catch (err) {
+        const message = (err as any)?.message;
+        if (message?.startsWith("Not enough balance for deposit!")) {
+          const match = message.match(/([\d\\.]+) ETH/);
+          if (feeToken.value && match?.length) {
+            const ethAmount = match[1].split(" ")?.[0];
+            recommendedBalance.value = parseEther(ethAmount);
+            return;
+          }
+        } else if (message?.includes("insufficient funds for gas * price + value")) {
+          throw new Error("Insufficient funds to cover deposit fee! Please, top up your account with ETH.");
+        }
+        throw err;
       }
       /* It can be either maxFeePerGas or gasPrice */
       if (fee.value && !fee.value?.maxFeePerGas) {

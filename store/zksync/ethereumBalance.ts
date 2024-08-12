@@ -1,4 +1,5 @@
 import { getBalance } from "@wagmi/core";
+import { utils } from "zksync-ethers";
 
 import { l1Networks } from "@/data/networks";
 import { wagmiConfig } from "@/data/wagmi";
@@ -6,7 +7,8 @@ import { wagmiConfig } from "@/data/wagmi";
 import type { Hash, TokenAmount } from "@/types";
 
 export const useZkSyncEthereumBalanceStore = defineStore("zkSyncEthereumBalances", () => {
-  const runtimeConfig = useRuntimeConfig();
+  const portalRuntimeConfig = usePortalRuntimeConfig();
+
   const onboardStore = useOnboardStore();
   const ethereumBalancesStore = useEthereumBalanceStore();
   const tokensStore = useZkSyncTokensStore();
@@ -39,8 +41,8 @@ export const useZkSyncEthereumBalanceStore = defineStore("zkSyncEthereumBalances
           amount: "0",
         })),
     ].sort((a, b) => {
-      if (a.address === ETH_TOKEN.l1Address) return -1; // Always bring ETH to the beginning
-      if (b.address === ETH_TOKEN.l1Address) return 1; // Keep ETH at the beginning if comparing with any other token
+      if (a.address === utils.ETH_ADDRESS) return -1; // Always bring ETH to the beginning
+      if (b.address === utils.ETH_ADDRESS) return 1; // Keep ETH at the beginning if comparing with any other token
       return 0; // Keep other tokens' order unchanged
     });
   };
@@ -54,7 +56,7 @@ export const useZkSyncEthereumBalanceStore = defineStore("zkSyncEthereumBalances
         const amount = await getBalance(wagmiConfig, {
           address: account.value.address!,
           chainId: l1Network.value!.id,
-          token: token.address === ETH_TOKEN.l1Address ? undefined : (token.address! as Hash),
+          token: token.address === utils.ETH_ADDRESS ? undefined : (token.address! as Hash),
         });
         return {
           ...token,
@@ -73,7 +75,10 @@ export const useZkSyncEthereumBalanceStore = defineStore("zkSyncEthereumBalances
     async () => {
       if (!l1Network.value) throw new Error(`L1 network is not available on ${selectedNetwork.value.name}`);
 
-      if (([l1Networks.mainnet.id] as number[]).includes(l1Network.value?.id) && runtimeConfig.public.ankrToken) {
+      if (
+        ([l1Networks.mainnet.id, l1Networks.sepolia.id] as number[]).includes(l1Network.value?.id) &&
+        portalRuntimeConfig.ankrToken
+      ) {
         return await getBalancesFromApi();
       } else {
         return await getBalancesFromRPC();

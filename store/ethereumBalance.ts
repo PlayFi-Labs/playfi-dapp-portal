@@ -1,5 +1,6 @@
 import { AnkrProvider } from "@ankr.com/ankr.js";
 import { BigNumber } from "ethers";
+import { utils } from "zksync-ethers";
 
 import { l1Networks } from "@/data/networks";
 
@@ -7,7 +8,8 @@ import type { TokenAmount } from "@/types";
 import type { Blockchain as AnkrSupportedChains } from "@ankr.com/ankr.js";
 
 export const useEthereumBalanceStore = defineStore("ethereumBalance", () => {
-  const runtimeConfig = useRuntimeConfig();
+  const portalRuntimeConfig = usePortalRuntimeConfig();
+
   const onboardStore = useOnboardStore();
   const { account } = storeToRefs(onboardStore);
   const { eraNetwork } = storeToRefs(useZkSyncProviderStore());
@@ -22,15 +24,18 @@ export const useEthereumBalanceStore = defineStore("ethereumBalance", () => {
     async () => {
       if (!account.value.address) throw new Error("Account is not available");
       if (!eraNetwork.value.l1Network) throw new Error(`L1 network is not available on ${eraNetwork.value.name}`);
-      if (!runtimeConfig.public.ankrToken) throw new Error("Ankr token is not available");
+      if (!portalRuntimeConfig.ankrToken) throw new Error("Ankr token is not available");
 
-      const ankrProvider = new AnkrProvider(`https://rpc.ankr.com/multichain/${runtimeConfig.public.ankrToken}`);
-      const networkIdToAnkr = new Map<number, AnkrSupportedChains>([[l1Networks.mainnet.id, "eth"]]);
+      const ankrProvider = new AnkrProvider(`https://rpc.ankr.com/multichain/${portalRuntimeConfig.ankrToken}`);
+      const networkIdToAnkr = new Map<number, AnkrSupportedChains | "eth_sepolia">([
+        [l1Networks.mainnet.id, "eth"],
+        [l1Networks.sepolia.id, "eth_sepolia"],
+      ]);
       if (!networkIdToAnkr.has(eraNetwork.value.l1Network.id)) {
         throw new Error(`Ankr does not support ${eraNetwork.value.l1Network.name}`);
       }
       const balances = await ankrProvider.getAccountBalance({
-        blockchain: [networkIdToAnkr.get(eraNetwork.value.l1Network.id)!],
+        blockchain: [networkIdToAnkr.get(eraNetwork.value.l1Network.id)!] as AnkrSupportedChains[],
         walletAddress: account.value.address,
         onlyWhitelisted: false,
       });
@@ -38,7 +43,7 @@ export const useEthereumBalanceStore = defineStore("ethereumBalance", () => {
         .filter((e) => e.contractAddress || e.tokenType === "NATIVE")
         .map((e) => {
           return {
-            address: e.tokenType === "NATIVE" ? ETH_TOKEN.l1Address : checksumAddress(e.contractAddress!),
+            address: e.tokenType === "NATIVE" ? utils.ETH_ADDRESS : checksumAddress(e.contractAddress!),
             symbol: e.tokenSymbol,
             name: e.tokenName,
             decimals: e.tokenDecimals,

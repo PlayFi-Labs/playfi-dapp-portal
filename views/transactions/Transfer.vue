@@ -122,7 +122,7 @@
       </template>
       <template v-else-if="step === 'confirm'">
         <CommonAlert
-          v-if="type === 'withdrawal'"
+          v-if="type === 'withdrawal' && !isCustomNode"
           variant="warning"
           :icon="ExclamationTriangleIcon"
           class="mb-block-padding-1/2 sm:mb-block-gap"
@@ -224,7 +224,7 @@
                   <CommonAlert variant="error" :icon="ExclamationTriangleIcon">
                     <p>
                       {{
-                        selectedToken?.address === ETH_TOKEN.address
+                        selectedToken?.address === L2_BASE_TOKEN_ADDRESS
                           ? "The fee has changed since the last estimation. "
                           : ""
                       }}Insufficient <span class="font-medium">{{ selectedToken?.symbol }}</span> balance to pay for
@@ -258,7 +258,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowTopRightOnSquareIcon, ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
+import { ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
 import { useRouteQuery } from "@vueuse/router";
 import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
@@ -331,7 +331,7 @@ const routeTokenAddress = computed(() => {
   return checksumAddress(route.query.token);
 });
 const defaultToken = computed(
-  () => availableTokens.value.find((e) => e.address === ETH_TOKEN.l1Address) ?? availableTokens.value[0] ?? undefined
+  () => availableTokens.value.find((e) => e.address === L2_BASE_TOKEN_ADDRESS) ?? availableTokens.value[0] ?? undefined
 );
 const selectedTokenAddress = ref<string | undefined>(routeTokenAddress.value ?? defaultToken.value?.address);
 const selectedToken = computed<Token | undefined>(() => {
@@ -474,8 +474,7 @@ const withdrawalManualFinalizationRequired = computed(() => {
   if (!transaction.value) return false;
   return (
     props.type === "withdrawal" &&
-    (isCustomNode ||
-      isWithdrawalManualFinalizationRequired(transaction.value.token, eraNetwork.value.l1Network?.id || -1))
+    isWithdrawalManualFinalizationRequired(transaction.value.token, eraNetwork.value.l1Network?.id || -1)
   );
 });
 
