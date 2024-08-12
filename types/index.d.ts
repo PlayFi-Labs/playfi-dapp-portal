@@ -9,6 +9,7 @@ export type Token = {
   decimals: number;
   iconUrl?: string;
   price?: TokenPrice;
+  isETH?: boolean;
 };
 export type TokenAmount = Token & { amount: BigNumberish };
 
@@ -131,5 +132,17 @@ declare global {
       track: (eventName: string, params?: unknown) => void;
       initialized: boolean;
     };
+    '##runtimeConfig'?: {
+      nodeType?: string;
+      walletConnectProjectId?: string;
+      ankrToken?: string;
+      screeningApiUrl?: string;
+      analytics?: {
+        rudder?: {
+          key: string;
+          dataplaneUrl: string;
+        }
+      }
+    }
   }
 }

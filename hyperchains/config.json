@@ -1,0 +1,31 @@
+[
+  {
+    "network": {
+      "id": 271,
+      "key": "albireo",
+      "name": "Albireo Local",
+      "rpcUrl": "http://localhost:3050",
+      "blockExplorerApi": "http://localhost:3020",
+      "blockExplorerUrl": "http://localhost:3010",
+      "l1Network": {
+        "id": 9,
+        "name": "Ethereum Local Node",
+        "nativeCurrency": { "name": "Ether", "symbol": "ETH", "decimals": 18 },
+        "rpcUrls": {
+          "default": { "http": ["http://localhost:8545"] },
+          "public": { "http": ["http://localhost:8545"] }
+        }
+      }
+    },
+    "tokens": [
+      {
+        "address": "0x000000000000000000000000000000000000800A",
+        "l1Address": "0xe441cf0795af14ddb9f7984da85cd36db1b8790d",
+        "symbol": "PLAY",
+        "name": "Play",
+        "decimals": 18,
+        "iconUrl": "/img/play.png"
+      }
+    ]
+  }
+]
