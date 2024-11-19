@@ -4,10 +4,10 @@
       <CommonButtonDropdown :toggled="open">
         <template #left-icon>
           <img
-              v-if="selectedNetwork.imageUrl"
-              :src="selectedNetwork.imageUrl"
-              :alt="selectedNetwork.name"
-              style="width: 24px; height: auto"
+            v-if="selectedNetwork.imageUrl"
+            :src="selectedNetwork.imageUrl"
+            :alt="selectedNetwork.name"
+            style="width: 24px; height: auto"
           />
           <IconsEra v-else />
         </template>
