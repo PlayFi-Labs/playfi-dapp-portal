@@ -1,3 +1,3 @@
 <template>
-  <img src="/logo.svg" alt="PlayFi" />
+  <img src="/logo.svg" alt="Lift" />
 </template>
