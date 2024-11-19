@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - development
+      - feature/domain-migration
 
 jobs:
   build_and_deploy:
