@@ -1,1 +1,41 @@
-[]
+[
+  {
+    "network": {
+      "id": 1612128021,
+      "key": "mizar",
+      "name": "Mizar",
+      "rpcUrl": "https://devnet-rpc.liftdata.ai",
+      "imageUrl": "/img/lift-icon.png",
+      "blockExplorerApi": "https://devnet-api.liftdata.ai",
+      "blockExplorerUrl": "https://devnet-explorer.liftdata.ai",
+      "l1Network": {
+        "id": 11155111,
+        "name": "Sepolia",
+        "network": "sepolia",
+        "nativeCurrency": {
+          "name": "Ether",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "rpcUrls": {
+          "default": {
+            "http": ["https://eth-sepolia.g.alchemy.com/v2/U9CvZ7-uGJAP5wKpHUCDXyo4R7JTItHq"]
+          },
+          "public": {
+            "http": ["https://eth-sepolia.g.alchemy.com/v2/U9CvZ7-uGJAP5wKpHUCDXyo4R7JTItHq"]
+          }
+        }
+      }
+    },
+    "tokens": [
+      {
+        "address": "0x000000000000000000000000000000000000800A",
+        "l1Address": "0x0000000000000000000000000000000000000000",
+        "symbol": "ETH",
+        "name": "Ether",
+        "decimals": 18,
+        "iconUrl": "/img/eth.svg"
+      }
+    ]
+  }
+]
