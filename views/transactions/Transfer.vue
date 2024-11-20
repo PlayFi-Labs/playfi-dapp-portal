@@ -258,7 +258,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowTopRightOnSquareIcon, ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
+import { ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
 import { useRouteQuery } from "@vueuse/router";
 import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
