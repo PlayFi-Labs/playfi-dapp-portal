@@ -1,3 +1,3 @@
 <template>
-  <img src="/logo.svg" alt="Lift" />
+  <img src="/logo.svg" alt="LIFT" />
 </template>
