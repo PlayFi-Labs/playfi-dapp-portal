@@ -1,4 +1,4 @@
-name: Deploy Package to Development 
+name: Deploy Package to Development
 
 on:
   push:
